@@ -34,7 +34,7 @@ function getFormattedDate() {
 function searchTweet() {
     var since = getFormattedDate();
     var params = {
-        q: '#100DaysOfCode OR #javascript OR #coding OR #hourofcode OR #programming OR #rust OR #reactjs OR #CodeNewbie OR #programmer OR #womenintech OR #womenwhocode since:' + since,
+        q: '#100DaysOfCode since:' + since,
         count: 20,
         result_type: 'recent'
     };
