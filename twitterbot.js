@@ -1,5 +1,6 @@
 var Twit = require('twit');
-var config = require('./config');
+var retweetapi = require('./retweetapi')
+var favtweetapi = require('./favtweetapi')
 
 var T = new Twit({
     consumer_key: '...',
@@ -30,7 +31,7 @@ function getFormattedDate() {
     return today = yyyy + '' + mm + '' + dd + '' + HH + '' + MM;
 }
 
-//search tweets
+//Code for search tweets
 function searchTweet() {
     var since = getFormattedDate();
     var params = {
@@ -45,28 +46,35 @@ function searchTweet() {
         var tweetMsgs = data.statuses;
 
         for (let i = 1; i <= tweetMsgs.length; i++) {
-            setTimeout(retweetMsg, 1000 * 20 * i, tweetMsgs[i])
+            setTimeout(retweetapi, 1000 * 20 * i, tweetMsgs[i])
         }
 
     }
 }
 
-function retweetMsg(tweetMsg) {
-
-    console.log("Getting tweet msg " + tweetMsg);
-    if (tweetMsg) {
-        console.log("Retweeting tweet with id " + tweetMsg.id);
-        T.post('statuses/retweet/:id', { id: tweetMsg.id_str }, retweetResult);
-    }
-}
-
-function retweetResult(err, data, response) {
-    if (err) {
-        console.log("Error message for retweet " + err.message);
-    } else {
-        console.log("Retweet json id" + data.id);
-    }
-}
-
 searchTweet();
 setInterval(searchTweet, 1000 * 60 * 15);
+
+//Code for making Tweet Favorite
+function searchAndFavTweet() {
+    var since = getFormattedDate();
+    var params = {
+        q: '#100DaysOfCode OR #javascript OR #coding OR #nodejs OR #rust OR #reactjs OR #womenintech OR #womenwhocode min_faves:2 since:' + since,
+        count: 4,
+        result_type: 'recent'
+    };
+
+    T.get('search/tweets', params, searchTweetResult);
+
+    function searchTweetResult(err, data, response) {
+        var tweetMsgs = data.statuses;
+
+        for (let i = 1; i <= tweetMsgs.length; i++) {
+            setTimeout(favtweetapi, 1000 * 60 * 15 * i, tweetMsgs[i-1]);
+            //setTimeout(favtweetapi, 1, tweetMsgs[i-1])
+        }
+
+    }
+}
+searchAndFavTweet();
+setInterval(searchAndFavTweet, 1000 * 60 * 60);
